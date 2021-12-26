@@ -2,8 +2,8 @@
 Message visualizator for various social networks.
 
 ## Social networks supported
-- Messenger
-- Telegram
+- Facebook Messenger (json)
+- Telegram (json)
 
 ## Usage
 Run `python socialviz.py --help` to see the list of command line arguments.
@@ -39,5 +39,6 @@ The possible types of plots are:
 
 ## TODO
 - [ ] Handle Discord data
+- [ ] Handle Skype data
 - [ ] Refactor command line arguments with actual subcommands
 - [ ] Refactor readers to add one more easily
