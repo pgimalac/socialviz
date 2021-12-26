@@ -24,9 +24,9 @@ python socialviz.py --tgaccount "John" --tgpath "./telegram.json" --tgsender "Jo
 ```sh
 python socialviz.py --no-attachs --fbaccount "johnsmith_fOhnrKt" --tgaccount "John" --display-distribution
 ```
-#### All messages sent by given account
+#### All messages sent by the given accounts, specify figure size and rotate labels
 ```sh
-python socialviz.py --all --fbsender "John Smith" --tgsender "John Smith"
+python socialviz.py --all --fbsender "John Smith" --tgsender "John Smith" --figsize-w 30 --figsize-h 15 --rotate-labels
 ```
 
 ## Plots
