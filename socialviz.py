@@ -1,6 +1,6 @@
 import argparse
 
-from readers import generics, facebook, telegram
+from readers import generics, facebook, telegram, discord
 from visualization import visualization as viz
 
 parser = argparse.ArgumentParser(
@@ -11,6 +11,7 @@ parser = argparse.ArgumentParser(
 generics.init(parser)
 facebook.init(parser)
 telegram.init(parser)
+discord.init(parser)
 viz.init(parser)
 
 # Parse
@@ -23,6 +24,7 @@ counter = {}
 # Run
 facebook.parse(counter, values)
 telegram.parse(counter, values)
+discord.parse(counter, values)
 
 # Generate dataframe from counter
 df = generics.df_from_counter(counter)

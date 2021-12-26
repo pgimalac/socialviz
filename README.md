@@ -4,6 +4,7 @@ Message visualizator for various social networks.
 ## Social networks supported
 - Facebook Messenger (json)
 - Telegram (json)
+- Discord (json) [exported with [https://github.com/Tyrrrz/DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter)]
 
 ## Usage
 Run `python socialviz.py --help` to see the list of command line arguments.
@@ -20,13 +21,13 @@ If the json file is located at `./telegram.json`, and we want to count messages 
 python socialviz.py --tgaccount "John" --tgpath "./telegram.json" --tgsender "John" --tgsender "Joe"
 ```
 
-#### Both Facebook and Telegram, no attachments, plot only the distribution
+#### Facebook and Telegram, no attachments, plot only the distribution
 ```sh
 python socialviz.py --no-attachs --fbaccount "johnsmith_fOhnrKt" --tgaccount "John" --display-distribution
 ```
 #### All messages sent by the given accounts, specify figure size and rotate labels
 ```sh
-python socialviz.py --all --fbsender "John Smith" --tgsender "John Smith" --figsize-w 30 --figsize-h 15 --rotate-labels
+python socialviz.py --all --fbsender "John Smith" --tgsender "John Smith" --dcsender "johnsmith" --figsize-w 30 --figsize-h 15 --rotate-labels
 ```
 
 ## Plots
@@ -38,7 +39,6 @@ The possible types of plots are:
 ![example of heatmap](./assets/heatmap.png)
 
 ## TODO
-- [ ] Handle Discord data
 - [ ] Handle Skype data
 - [ ] Refactor command line arguments with actual subcommands
 - [ ] Refactor readers to add one more easily
