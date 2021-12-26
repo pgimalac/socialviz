@@ -46,8 +46,29 @@ def display_values_per_day(df):
 
 # Displays the distribution for each year (min, 1st quartile, median, 3rd quartile, max + outliers)
 def display_distribution(df):
-    years = list(reversed(df["year"].unique()))
+    years = list(df["year"].unique())
     plt.figure(figsize=(20, 8))
     plt.boxplot(list(map(lambda year: df[df["year"] == year]["count"], years)),
                 labels=years)
     plt.show()
+
+displays = [("display-distribution", display_distribution,
+             "display the yearly distribution of the messages"),
+            ("display-counter", display_values_per_day,
+             "display the number of messages for each day")]
+
+def init(parser):
+    group = parser.add_argument_group(
+        "displays",
+        "the various possible displays. If none is selected, all are displayed"
+    )
+    for name, _, helper in displays:
+        group.add_argument(f"--{name}", action='store_true', help=helper)
+
+def display(df, values):
+    any_specified = any(
+        map(lambda display: values[display[0].replace('-', '_')], displays))
+
+    for name, display, _ in displays:
+        if not any_specified or values[name.replace('-', '_')]:
+            display(df)
