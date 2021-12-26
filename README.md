@@ -28,10 +28,10 @@ python socialviz.py --no-attachs --fbaccount "johnsmith_fOhnrKt" --tgaccount "Jo
 ## Plots
 The possible types of plots are:
 - plot the yearly distribution of daily count of messages
-![example of distribution plot](distribution.png)
+![example of distribution plot](./assets/distribution.png)
 
 - plot a 2D heatmap containing the daily counts of messages, for each day and year-month
-![example of heatmap](counter.png)
+![example of heatmap](./assets/heatmap.png)
 
 ## TODO
 - [ ] Handle Discord data
