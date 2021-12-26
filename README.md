@@ -8,19 +8,19 @@ Message visualizator for various social networks.
 ## Usage
 Run `python socialviz.py --help` to see the list of command line arguments.
 
-### Facebook only example, for all senders
+#### Facebook only, for all senders
 If the inbox directory is located at `./messages/inbox`, and we want to count messages in the directory named `johnsmith_fO2hnrKt`:
 ```sh
 python socialviz.py --fbpath "./messages/inbox" --fbaccount "johnsmith_fOhnrKt"
 ```
 
-### Telegram only example, for senders "John" and "Joe"
+#### Telegram only, for senders "John" and "Joe"
 If the json file is located at `./telegram.json`, and we want to count messages in the chat named `John`:
 ```sh
 python socialviz.py --tgaccount "John" --tgpath "./telegram.json" --tgsender "John" --tgsender "Joe"
 ```
 
-### Both Facebook and Telegram, no attachments, plot only the distribution
+#### Both Facebook and Telegram, no attachments, plot only the distribution
 ```sh
 python socialviz.py --no-attachs --fbaccount "johnsmith_fOhnrKt" --tgaccount "John" --display-distribution
 ```
