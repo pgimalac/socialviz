@@ -41,6 +41,10 @@ def init(parser):
         help=
         "if specified, multiple attachments sent at once are counted as several messages"
     )
+    parser.add_argument(
+        '--all',
+        action='store_true',
+        help="count messages sent by the given accounts accross all chats")
 
 # Iterates from first to last inclusive, with the given step.
 def iterdate(first, last, step=dt.timedelta(days=1)):

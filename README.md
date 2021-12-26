@@ -24,6 +24,10 @@ python socialviz.py --tgaccount "John" --tgpath "./telegram.json" --tgsender "Jo
 ```sh
 python socialviz.py --no-attachs --fbaccount "johnsmith_fOhnrKt" --tgaccount "John" --display-distribution
 ```
+#### All messages sent by given account
+```sh
+python socialviz.py --all --fbsender "John Smith" --tgsender "John Smith"
+```
 
 ## Plots
 The possible types of plots are:
