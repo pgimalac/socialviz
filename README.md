@@ -51,10 +51,16 @@ python socialviz.py --all --fbsender "John Smith" --tgsender "John Smith" --dcse
 ## Plots
 The possible types of plots are:
 - plot the yearly distribution of daily count of messages
-![example of distribution plot](./assets/distribution.png)
+![example of distribution plot](./assets/distribution-year.png)
+
+- plot the monthly distribution of daily count of messages
+![example of distribution plot](./assets/distribution-month.png)
 
 - plot a 2D heatmap containing the daily counts of messages, for each day and year-month
 ![example of heatmap](./assets/heatmap.png)
+
+- plot the total count of messages per hour
+![example of the count of messages per hour](./assets/count-hours.png)
 
 ## TODO
 - [ ] Handle Skype data

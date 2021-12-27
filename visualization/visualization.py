@@ -1,3 +1,4 @@
+import sys
 import math
 import datetime as dt
 import numpy as np
@@ -27,7 +28,7 @@ def itermonth(first, last):
             month += 1
 
 def count_by(df, by, fill=True):
-    grouped = df.groupby([by])[by].count().rename_axis("count")
+    grouped = df.groupby([by])[by].count()
 
     if fill:
         # Generate range of all values
@@ -56,7 +57,6 @@ def count_by(df, by, fill=True):
         # Fill missing values with given range
         if allvalues is not None:
             missing = pd.Series(index=set(allvalues).difference(grouped.index))
-            print(missing)
             grouped = grouped.append(missing).fillna(0)
 
     grouped.sort_index(inplace=True)
@@ -74,15 +74,15 @@ def display_values_per_day(df,
                            width=DEFAULT_WIDTH,
                            height=DEFAULT_HEIGHT,
                            labelrotate=False):
-    df = count_by(df, "date")
-    df["year-month"] = map(
-        df.index.to_series().map(lambda date: f"{date.year}-{date.month:02}"))
-    df["day"] = map(df.index.to_series().map(lambda date: date.day))
+    df = pd.DataFrame(count_by(df, "date"), columns=["count"])
+    df["year-month"] = df.index.to_series().map(
+        lambda date: f"{date.year}-{date.month:02}")
+    df["day"] = df.index.to_series().map(lambda date: date.day)
 
     rotation = 0
     if labelrotate:
         rotation = 90
-    months = sorted(reversed(df["year-month"].drop_duplicates()))
+    months = sorted(df["year-month"].drop_duplicates())
     days = list(range(1, 32))
 
     # Generate a bidimensional array, the first dimension is of size 31 (one per day), the second is dimension is year-month
@@ -125,10 +125,15 @@ def display_count_hour(df, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
 # Displays the distribution for each year/month (min, 1st quartile, median, 3rd quartile, max + outliers)
 def display_distribution(df, by, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
     uniqueby = sorted(df[by].unique())
-    df = count_by(df, by)
-    df["year"] = map(df.index.to_series().map(lambda date: date.year))
-    df["year-month"] = map(
-        df.index.to_series().map(lambda date: f"{date.year}-{date.month:02}"))
+    df = pd.DataFrame(count_by(df, "date"), columns=["count"])
+    if by == "year":
+        df["year"] = df.index.to_series().map(lambda date: date.year)
+    elif by == "year-month":
+        df["year-month"] = df.index.to_series().map(
+            lambda date: f"{date.year}-{date.month:02}")
+    else:
+        print("Invalid column to display distribution")
+        sys.exit(1)
 
     plt.figure(figsize=(width, height))
     plt.boxplot(list(
