@@ -1,5 +1,4 @@
 import argparse
-
 from readers import generics, facebook, telegram, discord
 from visualization import visualization as viz
 
@@ -18,16 +17,16 @@ viz.init(parser)
 args = parser.parse_args()
 values = vars(args)
 
-# Init message counter
-counter = {}
+# Init message list
+msgs = []
 
 # Run
-facebook.parse(counter, values)
-telegram.parse(counter, values)
-discord.parse(counter, values)
+facebook.parse(msgs, values)
+telegram.parse(msgs, values)
+discord.parse(msgs, values)
 
-# Generate dataframe from counter
-df = generics.df_from_counter(counter)
+# Generate full dataframe with helper columns
+df = generics.df_from_list(msgs)
 
 # Display
 viz.display(df, values)

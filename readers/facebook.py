@@ -5,8 +5,8 @@ import datetime as dt
 DEFAULT_PATH = "./messages/inbox/"
 
 # Returns the number of messages for each date, for the given json messages.
-def count_messages_json(msgs,
-                        counter,
+def count_messages_json(chats,
+                        msgs,
                         sender=None,
                         attachs=True,
                         multattachs=False):
@@ -18,18 +18,17 @@ def count_messages_json(msgs,
     if isinstance(sender, list):
         sender = set(sender)
 
-    for message in msgs["messages"]:
+    for message in chats["messages"]:
         if message["is_unsent"]:
             continue
 
         if sender is not None and message["sender_name"] not in sender:
             continue
 
-        date = dt.datetime.fromtimestamp(message["timestamp_ms"] //
-                                         1000).date()
+        date = dt.datetime.fromtimestamp(message["timestamp_ms"] // 1000)
 
         if "content" in message:
-            counter[date] = counter.get(date, 0) + 1
+            msgs.append(date)
 
         if not attachs:
             continue
@@ -38,21 +37,22 @@ def count_messages_json(msgs,
             len(message[attach]) for attach in attachtypes if attach in message
         ])
         if multattachs:
-            counter[date] = counter.get(date, 0) + nbattachs
+            for _ in range(nbattachs):
+                msgs.append(date)
         elif nbattachs > 0:
-            counter[date] = counter.get(date, 0) + 1
+            msgs.append(date)
 
 def count_messages(account,
-                   counter,
+                   msgs,
                    sender=None,
                    path=DEFAULT_PATH,
                    attachs=True,
                    multattachs=False):
-    """Adds the number of messages for each date to the counter.
+    """Adds the number of messages for each date to the msgs.
 
     Arguments:
     account: the name of the directory corresponding to the wanted account.
-    counter: the dictionary containing the number of messages for each date.
+    msgs: the list of message time.
     path: the actual path to the inbox directory. Defaults to  "./messages/inbox".
     sender: either a string corresponding to the name of a sender, a set of senders, or None. If None, all senders are counted.
     attachs: a boolean indicating whether attachments (files, gifs, stickers, images, videos, etc) are counted as messages. Defaults to True.
@@ -72,20 +72,19 @@ def count_messages(account,
         try:
             with open(f"{path}/{account}/message_{number}.json",
                       encoding='utf8') as reader:
-                msgs = json.load(reader)
-                count_messages_json(msgs, counter, sender, attachs,
-                                    multattachs)
+                chats = json.load(reader)
+                count_messages_json(chats, msgs, sender, attachs, multattachs)
         except FileNotFoundError:
             return
 
-def count_all_messages(counter,
+def count_all_messages(msgs,
                        sender,
                        path=DEFAULT_PATH,
                        attachs=True,
                        multattachs=False):
     for file in os.listdir(path):
         if os.path.isdir(f"{path}/{file}"):
-            count_messages(file, counter, sender, path, attachs, multattachs)
+            count_messages(file, msgs, sender, path, attachs, multattachs)
 
 # Initiate Facebook command line parameters
 def init(parser):
@@ -115,17 +114,17 @@ def init(parser):
         "the list of considered senders. If not specified, all messages are counted. Use once per sender"
     )
 
-def parse(counter, values):
+def parse(msgs, values):
     if values["all"]:
         if values["fbsender"] is not None:
-            count_all_messages(counter,
+            count_all_messages(msgs,
                                values["fbsender"],
                                path=values["fbpath"],
                                attachs=not values["no_attachs"],
                                multattachs=values["multi_attachs"])
     elif values["fbaccount"] is not None:
         count_messages(values["fbaccount"],
-                       counter,
+                       msgs,
                        sender=values["fbsender"],
                        path=values["fbpath"],
                        attachs=not values["no_attachs"],

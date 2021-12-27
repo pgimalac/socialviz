@@ -2,30 +2,9 @@ import os
 import json
 import datetime as dt
 
-# "id": "707219482610761849",
-# "type": "Default",
-# "timestamp": "2020-05-05T13:17:44.157+00:00",
-# "timestampEdited": null,
-# "callEndedTimestamp": null,
-# "isPinned": false,
-# "content": "il faut que je me pose pour lire ça avant",
-# "author": {
-#  "id": "389088437778644992",
-#  "name": "Peaupote",
-#  "discriminator": "0753",
-#  "nickname": "Peaupote",
-#  "color": null,
-#  "isBot": false,
-#  "avatarUrl": "https://cdn.discordapp.com/avatars/389088437778644992/7946585345d7ca64f7496fac82f5e178.png?size=128"
-# },
-# "attachments": [],
-# "embeds": [],
-# "reactions": [],
-# "mentions": []
-
 DEFAULT_PATH = "./discord"
 
-def count_messages_json(counter,
+def count_messages_json(msgs,
                         chats,
                         sender=None,
                         attachs=True,
@@ -37,32 +16,33 @@ def count_messages_json(counter,
             continue
 
         date = dt.datetime.strptime(
-            message["timestamp"][:message["timestamp"].rindex('T')],
-            "%Y-%m-%d").date()
+            message["timestamp"][:message["timestamp"].rindex('T') + 8],
+            "%Y-%m-%dT%H:%M:%S")
 
         if "content" in message:
-            counter[date] = counter.get(date, 0) + 1
+            msgs.append(date)
 
         if not attachs:
             continue
 
         nbattachs = len(message["attachments"])
         if multattachs:
-            counter[date] = counter.get(date, 0) + nbattachs
-        else:
-            counter[date] = counter.get(date, 0) + 1
+            for _ in range(nbattachs):
+                msgs.append(date)
+        elif nbattachs > 0:
+            msgs.append(date)
 
 def count_messages(account,
-                   counter,
+                   msgs,
                    path=DEFAULT_PATH,
                    sender=None,
                    attachs=True,
                    multattachs=False):
-    """Adds the number of messages for each date to the counter.
+    """Adds the messages to the msgs.
 
     Arguments:
     account: the name of the json file for which we want to count the messages.
-    counter: the dictionary containing the number of messages for each date.
+    msgs: the list of dates of messages.
     path: the path to the directory containing the conversations. Defaults to  DEFAULT_PATH.
     sender: either a string corresponding to the name of a sender, a set of senders, or None. If None, all senders are counted.
     attachs: a boolean indicating whether attachments (files, gifs, stickers, images, videos, etc) are counted as messages. Defaults to True.
@@ -76,9 +56,9 @@ def count_messages(account,
         if isinstance(sender, str):
             sender = {sender}
 
-        count_messages_json(counter, chats, sender, attachs, multattachs)
+        count_messages_json(msgs, chats, sender, attachs, multattachs)
 
-def count_all_messages(counter,
+def count_all_messages(msgs,
                        sender=None,
                        path=DEFAULT_PATH,
                        attachs=True,
@@ -87,8 +67,7 @@ def count_all_messages(counter,
         if file.endswith(".json") and os.path.isfile(f"{path}/{file}"):
             with open(f"{path}/{file}", encoding='utf8') as reader:
                 chats = json.load(reader)
-                count_messages_json(counter, chats, sender, attachs,
-                                    multattachs)
+                count_messages_json(msgs, chats, sender, attachs, multattachs)
 
 # Initiate Discord command line parameters
 def init(parser):
@@ -119,17 +98,17 @@ def init(parser):
         "the list of considered senders. If not specified, all messages are counted. Use once per sender"
     )
 
-def parse(counter, values):
+def parse(msgs, values):
     if values["all"]:
         if values["dcsender"] is not None:
-            count_all_messages(counter,
+            count_all_messages(msgs,
                                values["dcsender"],
                                path=values["dcpath"],
                                attachs=not values["no_attachs"],
                                multattachs=values["multi_attachs"])
     elif values["dcaccount"] is not None:
         count_messages(values["dcaccount"],
-                       counter,
+                       msgs,
                        sender=values["dcsender"],
                        path=values["dcpath"],
                        attachs=not values["no_attachs"],

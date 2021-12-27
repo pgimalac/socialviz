@@ -3,7 +3,7 @@ import datetime as dt
 
 DEFAULT_PATH = "./telegram.json"
 
-def count_messages_json(counter,
+def count_messages_json(msgs,
                         chats,
                         sender=None,
                         attachs=True,
@@ -13,30 +13,29 @@ def count_messages_json(counter,
                                      and message["from"] not in sender):
             continue
 
-        date = dt.datetime.strptime(message["date"],
-                                    "%Y-%m-%dT%H:%M:%S").date()
+        date = dt.datetime.strptime(message["date"], "%Y-%m-%dT%H:%M:%S")
 
         if "text" in message:
-            counter[date] = counter.get(date, 0) + 1
+            msgs.append(date)
 
         if not attachs:
             continue
 
         # attachments sent one by one in Telegram ?
         if "file" in message:
-            counter[date] = counter.get(date, 0) + 1
+            msgs.append(date)
 
 def count_messages(account,
-                   counter,
+                   msgs,
                    path=DEFAULT_PATH,
                    sender=None,
                    attachs=True,
                    multattachs=False):
-    """Adds the number of messages for each date to the counter.
+    """Adds the times of messages to msgs.
 
     Arguments:
     account: the name of the chat for which we want to count the messages.
-    counter: the dictionary containing the number of messages for each date.
+    msgs: the list containing the times of each messages.
     path: the path to the json file containing the conversations. Defaults to  DEFAULT_PATH.
     sender: either a string corresponding to the name of a sender, a set of senders, or None. If None, all senders are counted.
     attachs: a boolean indicating whether attachments (files, gifs, stickers, images, videos, etc) are counted as messages. Defaults to True.
@@ -52,22 +51,21 @@ def count_messages(account,
 
         for chats in msgs["chats"]["list"]:
             if chats["name"] == account:
-                count_messages_json(counter, chats, sender, attachs,
-                                    multattachs)
+                count_messages_json(msgs, chats, sender, attachs, multattachs)
 
-def count_all_messages(counter,
+def count_all_messages(msgs,
                        sender=None,
                        path=DEFAULT_PATH,
                        attachs=True,
                        multattachs=False):
     with open(path, encoding='utf8') as reader:
-        msgs = json.load(reader)
+        allmsgs = json.load(reader)
 
         if isinstance(sender, str):
             sender = {sender}
 
-        for chats in msgs["chats"]["list"]:
-            count_messages_json(counter, chats, sender, attachs, multattachs)
+        for chats in allmsgs["chats"]["list"]:
+            count_messages_json(msgs, chats, sender, attachs, multattachs)
 
 # Initiate Telegram command line parameters
 def init(parser):
@@ -98,17 +96,17 @@ def init(parser):
         "the list of considered senders. If not specified, all messages are counted. Use once per sender"
     )
 
-def parse(counter, values):
+def parse(msgs, values):
     if values["all"]:
         if values["tgsender"] is not None:
-            count_all_messages(counter,
+            count_all_messages(msgs,
                                values["tgsender"],
                                path=values["tgpath"],
                                attachs=not values["no_attachs"],
                                multattachs=values["multi_attachs"])
     elif values["tgaccount"] is not None:
         count_messages(values["tgaccount"],
-                       counter,
+                       msgs,
                        sender=values["tgsender"],
                        path=values["tgpath"],
                        attachs=not values["no_attachs"],

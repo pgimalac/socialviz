@@ -1,31 +1,26 @@
 import sys
-import datetime as dt
 import pandas as pd
+import datetime as dt
 
-# Build the dataframe
-def df_from_counter(counter):
-    if not counter:
+# Generates a dataframe from the time list
+# and add helper columns
+def df_from_list(msgs):
+    if not msgs:
         print("No message found")
         sys.exit(0)
 
-    df = pd.DataFrame()
-    df["time"] = counter.keys()
-    df["count"] = counter.values()
+    df = pd.DataFrame(msgs, columns=["time"])
     df.set_index("time", inplace=True)
     df.sort_index(inplace=True)
 
-    # Fill missing dates, between first and last
-    alldates = pd.DataFrame(index=list(iterdate(min(df.index), max(df.index))))
-    missing = pd.DataFrame(index=alldates.index.difference(df.index))
-    missing["count"] = 0
-    df = df.append(missing)
-
     # Generate helper columns
-    df["year"] = df.index.to_series().apply(lambda time: time.year)
-    df["month"] = df.index.to_series().apply(lambda time: time.month)
-    df["year-month"] = df.index.to_series().apply(
+    df["year"] = df.index.to_series().map(lambda time: time.year)
+    df["year-month"] = df.index.to_series().map(
         lambda time: f"{time.year}-{time.month:02}")
-    df["day"] = df.index.to_series().apply(lambda time: time.day)
+    df["month"] = df.index.to_series().map(lambda time: time.month)
+    df["day"] = df.index.to_series().map(lambda time: time.day)
+    df["hour"] = df.index.to_series().map(lambda time: time.hour)
+    df["date"] = df.index.to_series().map(lambda time: time.date())
 
     return df
 
@@ -45,9 +40,3 @@ def init(parser):
         '--all',
         action='store_true',
         help="count messages sent by the given accounts accross all chats")
-
-# Iterates from first to last inclusive, with the given step.
-def iterdate(first, last, step=dt.timedelta(days=1)):
-    while first <= last:
-        yield first
-        first += step
