@@ -44,12 +44,12 @@ def count_messages(account,
     """
 
     with open(path, encoding='utf8') as reader:
-        msgs = json.load(reader)
+        allmsgs = json.load(reader)
 
         if isinstance(sender, str):
             sender = {sender}
 
-        for chats in msgs["chats"]["list"]:
+        for chats in allmsgs["chats"]["list"]:
             if chats["name"] == account:
                 count_messages_json(msgs, chats, sender, attachs, multattachs)
 

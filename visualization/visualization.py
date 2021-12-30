@@ -109,6 +109,11 @@ def display_values_per_day(df,
                      size=6,
                      rotation=rotation)
 
+    # Better way ! But not visualy satisfying... TODO check that
+    # import seaborn as sns
+    # df2 = pd.crosstab(df['day'], df['year-month'])
+    # sns.heatmap(df2, annot=False)
+
     # Explicitly set x ticks as the list of year-month
     plt.xticks(ticks=range(len(months)), labels=months, rotation=90)
     # Explicitly set y ticks as the list of ints from 1 to 31
